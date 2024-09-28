@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode News App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #news-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .news-item {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .news-item:hover {
+            transform: scale(1.02);
+        }
+
+        .news-item h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .news-item p {
+            margin-bottom: 10px;
+        }
+
+        .news-item a {
+            color: #007aff;
+            text-decoration: none;
+        }
+
+        nav {
+            background-color: rgba(29, 29, 31, 0.7);
+            backdrop-filter: blur(20px);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        nav button {
+            background-color: transparent;
+            border: none;
+            color: #007aff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        nav button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>News App</h1>
+        <div id="news-container"></div>
+    </div>
+    <nav>
+        <button id="top-headlines">Top Headlines</button>
+        <button id="technology">Technology</button>
+        <button id="business">Business</button>
+        <button id="entertainment">Entertainment</button>
+    </nav>
+
+    <script>
+          const apiKey = 'b3d56bd72013487da9c6dd9245b773be'; 
+        const newsContainer = document.getElementById('news-container');
+        const buttons = document.querySelectorAll('nav button');
+
+        async function fetchNews(category = 'general') {
+            try {
+                const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${apiKey}`);
+                const data = await response.json();
+                displayNews(data.articles.slice(0, 100));
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                newsContainer.innerHTML = '<p>Error fetching news. Please try again later.</p>';
+            }
+        }
+
+        function displayNews(articles) {
+            newsContainer.innerHTML = '';
+            articles.forEach(article => {
+                const newsItem = document.createElement('div');
+                newsItem.classList.add('news-item');
+                newsItem.innerHTML = `
+                    <h2>${article.title}</h2>
+                    <p>${article.description || 'No description available.'}</p>
+                    <a href="${article.url}" target="_blank">Read more</a>
+                `;
+                newsContainer.appendChild(newsItem);
+            });
+        }
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const category = button.id === 'top-headlines' ? 'general' : button.id;
+                fetchNews(category);
+            });
+        });
+
+        // Initial fetch
+        fetchNews();
+    </script>
+</body>
+</html>
